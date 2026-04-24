@@ -3,6 +3,10 @@
 
 name: "publish"
 
+permissions:
+  contents: write
+  packages: read
+
 on:
   workflow_run:
     workflows: ["tests"]
