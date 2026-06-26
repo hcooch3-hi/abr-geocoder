@@ -33,10 +33,8 @@ jobs:
         run: |
           echo "=== CURL test ==="
           curl -v -L "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" -o test.bin || true
-
           echo "=== file type ==="
           file test.bin || true
-
           echo "=== head ==="
           head -c 100 test.bin || true
 
@@ -47,4 +45,3 @@ jobs:
           path: |
             debug.log
             test.bin
-``
