@@ -1,0 +1,52 @@
+name: ABRG Light Test (Partial Download)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install abrg
+        run: |
+          npm install -g @digital-go-jp/abr-geocoder@2.2.1
+
+      - name: Show Public IP
+        run: |
+          echo "=== Public IP ==="
+          curl ifconfig.me
+          echo ""
+
+      # ✅ 地域限定（千代田区）
+      - name: ABRG download (Chiyoda only)
+        timeout-minutes: 5
+        run: |
+          abrg download -c 131016 --debug 2>&1 | tee debug.log
+
+      # ✅ 直接curl（原因確認）
+      - name: CURL test
+        run: |
+          curl -v -L \
+            "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" \
+            -o test.bin || true
+
+          echo "=== file type ==="
+          file test.bin || true
+
+          echo "=== head ==="
+          head -c 100 test.bin || true
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: abrg-light-result
+          path: |
+            debug.log
+            test.bin
+``
