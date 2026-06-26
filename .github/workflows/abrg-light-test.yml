@@ -25,8 +25,9 @@ jobs:
 
       - name: ABRG download (Chiyoda only)
         timeout-minutes: 2
+        continue-on-error: true
         run: |
-          abrg download -c 131016 --debug 2>&1 | tee debug.log || true
+          abrg download -c 131016 --debug 2>&1 | tee debug.log
 
       - name: CURL test
         run: |
@@ -46,3 +47,4 @@ jobs:
           path: |
             debug.log
             test.bin
+``
