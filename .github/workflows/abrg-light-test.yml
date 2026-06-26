@@ -23,18 +23,15 @@ jobs:
           curl ifconfig.me
           echo ""
 
-      # ✅ 地域限定（千代田区）
       - name: ABRG download (Chiyoda only)
         timeout-minutes: 5
         run: |
           abrg download -c 131016 --debug 2>&1 | tee debug.log
 
-      # ✅ 直接curl（原因確認）
       - name: CURL test
         run: |
-          curl -v -L \
-            "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" \
-            -o test.bin || true
+          echo "=== CURL test ==="
+          curl -v -L "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" -o test.bin || true
 
           echo "=== file type ==="
           file test.bin || true
@@ -49,4 +46,3 @@ jobs:
           path: |
             debug.log
             test.bin
-``
