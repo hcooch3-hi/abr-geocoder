@@ -19,17 +19,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      # ✅ ★ここを追加（重要）
+      - name: Install abrg
+        run: |
+          npm install -g @digital-go-jp/abr-geocoder@2.2.1
+
       - name: Check package version (local)
         run: |
           echo "=== package.json ==="
           cat package.json
 
-          echo "=== npm ls ==="
-          npm ls @digital-go-jp/abr-geocoder || true
+          echo "=== npm ls (global) ==="
+          npm ls -g @digital-go-jp/abr-geocoder || true
 
+      # ✅ npx → abrg に変更
       - name: Run CLI version
         run: |
-          npx abrg --version
+          abrg --version
 
       - name: Show Public IP
         run: |
@@ -40,7 +46,7 @@ jobs:
       - name: Run download (DEBUG)
         run: |
           set -o pipefail
-          npx abrg download --debug 2>&1 | tee debug.log
+          abrg download --debug 2>&1 | tee debug.log
 
       - name: Extract URLs
         run: |
@@ -56,3 +62,21 @@ jobs:
             i=$((i+1))
             echo "===== Checking $url ====="
 
+            curl -v -L "$url" -o "curl-test/out_$i.bin" 2> "curl-test/log_$i.txt" || true
+
+            echo "--- file type ---"
+            file "curl-test/out_$i.bin" || true
+
+            echo "--- head (100 bytes) ---"
+            head -c 100 "curl-test/out_$i.bin" || true
+            echo ""
+          done < urls.txt
+
+      - name: Upload logs
+        uses: actions/upload-artifact@v4
+        with:
+          name: abrg-investigation
+          path: |
+            debug.log
+            urls.txt
+            curl-test
