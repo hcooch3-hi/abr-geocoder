@@ -1,0 +1,58 @@
+name: ABRG Debug (Official Repo Test)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout official repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check package version (local)
+        run: |
+          echo "=== package.json ==="
+          cat package.json
+
+          echo "=== npm ls ==="
+          npm ls @digital-go-jp/abr-geocoder || true
+
+      - name: Run CLI version
+        run: |
+          npx abrg --version
+
+      - name: Show Public IP
+        run: |
+          echo "=== Public IP ==="
+          curl ifconfig.me
+          echo ""
+
+      - name: Run download (DEBUG)
+        run: |
+          set -o pipefail
+          npx abrg download --debug 2>&1 | tee debug.log
+
+      - name: Extract URLs
+        run: |
+          echo "=== Extract URLs ==="
+          grep -Eo 'https?://[^ ]+' debug.log | sort -u | tee urls.txt
+
+      - name: Curl check
+        run: |
+          mkdir -p curl-test
+
+          i=0
+          while read url; do
+            i=$((i+1))
+            echo "===== Checking $url ====="
+
