@@ -1,0 +1,52 @@
+name: Curl Test (ArcGIS URL)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  curl-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Show Public IP
+        run: |
+          echo "=== Public IP ==="
+          curl ifconfig.me
+          echo ""
+
+      - name: Test (Default curl)
+        run: |
+          echo "=== Default curl ==="
+          curl -v -L \
+            "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" \
+            -o default.bin || true
+
+          echo "--- file type ---"
+          file default.bin || true
+
+          echo "--- head ---"
+          head -c 100 default.bin || true
+
+      - name: Test (Browser-like UA)
+        run: |
+          echo "=== Browser UA curl ==="
+          curl -v -L \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)" \
+            -H "Accept: application/zip" \
+            -H "Accept-Language: ja-JP" \
+            "https://data.address-br.digital.go.jp/mt_town_fullset/mt_town_fullset_all.csv.zip" \
+            -o browser.bin || true
+
+          echo "--- file type ---"
+          file browser.bin || true
+
+          echo "--- head ---"
+          head -c 100 browser.bin || true
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: curl-test-result
+          path: |
+            default.bin
+            browser.bin
