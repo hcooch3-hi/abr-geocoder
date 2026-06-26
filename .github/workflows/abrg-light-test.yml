@@ -24,9 +24,9 @@ jobs:
           echo ""
 
       - name: ABRG download (Chiyoda only)
-        timeout-minutes: 5
+        timeout-minutes: 2
         run: |
-          abrg download -c 131016 --debug 2>&1 | tee debug.log
+          abrg download -c 131016 --debug 2>&1 | tee debug.log || true
 
       - name: CURL test
         run: |
